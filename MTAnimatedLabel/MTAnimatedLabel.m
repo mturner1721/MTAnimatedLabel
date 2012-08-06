@@ -132,6 +132,10 @@
     [self setNeedsDisplay];
 }
 
+
+/*
+ //Shadows don't work with a masked layer
+
 -(UIColor *)shadowColor
 {
     return [UIColor colorWithCGColor:_textLayer.shadowColor];
@@ -153,7 +157,7 @@
     _textLayer.shadowOffset = shadowOffset;
     [self setNeedsDisplay];
 }
-
+*/
 
 - (UITextAlignment)textAlignment
 {
