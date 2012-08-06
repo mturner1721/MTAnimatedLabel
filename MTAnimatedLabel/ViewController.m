@@ -36,18 +36,17 @@
     }
     
     if (gr.state == UIGestureRecognizerStateChanged) {
-        CGPoint t = [gr translationInView:self.view];
         
-        if (self.slider.frame.origin.x + t.x <= kMaxTranslation && self.slider.frame.origin.x+t.x >= sliderInitialX) {
-            
-            CGRect f = self.slider.frame;
-            f.origin.x += t.x;
-            self.slider.frame = f;
-            
-            self.animatedLabel.alpha = 1-(self.slider.frame.origin.x/(kMaxTranslation*0.5 - sliderInitialX));
-            
-            [gr setTranslation:CGPointZero inView:self.view];
-        }
+        CGPoint t = [gr translationInView:self.view]; //get Translation
+        
+        CGRect f = self.slider.frame;
+        f.origin.x = MAX(sliderInitialX, MIN(kMaxTranslation, f.origin.x+t.x)); //enforce slider bounds
+        self.slider.frame = f;
+        
+        self.animatedLabel.alpha = 1-(self.slider.frame.origin.x/(kMaxTranslation*0.5 - sliderInitialX)); //calc label alpha
+        
+        [gr setTranslation:CGPointZero inView:self.view]; //reset translation
+
     }
     
     if (gr.state == UIGestureRecognizerStateEnded) {
