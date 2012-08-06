@@ -1,6 +1,6 @@
 //
 //  MTAnimatedLabel.m
-//  AnimatedUILabelExample
+//  
 //
 //  Created by michael on 8/3/12.
 //  Copyright (c) 2012 Michael Turner. All rights reserved.
@@ -11,6 +11,9 @@
 
 #define kGradientSize       0.45f
 #define kAnimationDuration  2.25f
+#define kGradientTint       [UIColor whiteColor]
+
+#define kAnimationKey       @"gradientAnimation"
 
 @interface MTAnimatedLabel () {
     
@@ -21,17 +24,24 @@
 
 
 @implementation MTAnimatedLabel
+@synthesize animationDuration   = _animationDuration;
+@synthesize gradientWidth       = _gradientWidth;
+@synthesize tint                = _tint;
 
 #pragma mark - Initialization
 
 - (void)initializeLayers
 {
+    /* set Defaults */
+    self.tint               = kGradientTint;
+    self.animationDuration  = kAnimationDuration;
+    self.gradientWidth      = kGradientSize;
+    
     CAGradientLayer *gradientLayer  = (CAGradientLayer *)self.layer;
-//    gradientLayer.delegate          = nil; //Stop UILabel from drawing because we are using a CATextLayer for that!
     gradientLayer.backgroundColor   = [super.textColor CGColor];
-    gradientLayer.startPoint        = CGPointMake(-kGradientSize, 0.);
+    gradientLayer.startPoint        = CGPointMake(-self.gradientWidth, 0.);
     gradientLayer.endPoint          = CGPointMake(0., 0.);
-    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[self.textColor CGColor],(id)[[UIColor whiteColor] CGColor], (id)[self.textColor CGColor], nil];
+    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[self.textColor CGColor],(id)[self.tint CGColor], (id)[self.textColor CGColor], nil];
 
     _textLayer                      = [CATextLayer layer];
     _textLayer.backgroundColor      = [[UIColor clearColor] CGColor];
@@ -80,7 +90,10 @@
 
 -(void) setTextColor:(UIColor *)textColor
 {
-    self.layer.backgroundColor   = [textColor CGColor];
+    CAGradientLayer *gradientLayer  = (CAGradientLayer *)self.layer;
+    gradientLayer.backgroundColor   = [textColor CGColor];
+    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[textColor CGColor],(id)[self.tint CGColor], (id)[textColor CGColor], nil];
+    
     [self setNeedsDisplay];
 }
 
@@ -192,34 +205,44 @@
 
 #pragma mark - MTAnimated Label Public Methods
 
-- (void)animate
+- (void)setTint:(UIColor *)tint
+{
+    _tint = tint;
+    
+    CAGradientLayer *gradientLayer  = (CAGradientLayer *)self.layer;
+    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[self.textColor CGColor],(id)[_tint CGColor], (id)[self.textColor CGColor], nil];
+    [self setNeedsDisplay];
+}
+
+- (void)startAnimating
 {
     CAGradientLayer *gradientLayer = (CAGradientLayer *)self.layer;
-    
-    if([gradientLayer animationForKey:@"gradientAnimation"] == nil) {
+    if([gradientLayer animationForKey:kAnimationKey] == nil) {
         
         CABasicAnimation *startPointAnimation = [CABasicAnimation animationWithKeyPath:@"startPoint"];
         startPointAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(1.0, 0)];
         startPointAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
         CABasicAnimation *endPointAnimation = [CABasicAnimation animationWithKeyPath:@"endPoint"];
-        endPointAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(1+kGradientSize, 0)];
+        endPointAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(1+self.gradientWidth, 0)];
         endPointAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
         CAAnimationGroup *group = [CAAnimationGroup animation];
         group.animations = [NSArray arrayWithObjects:startPointAnimation, endPointAnimation, nil];
-        group.duration = kAnimationDuration;
+        group.duration = self.animationDuration;
         group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         group.repeatCount = FLT_MAX;
         
-        [gradientLayer addAnimation:group forKey:@"gradientAnimation"];
-        
-    } else {
-        [gradientLayer removeAnimationForKey:@"gradientAnimation"];
+        [gradientLayer addAnimation:group forKey:kAnimationKey];
     }
 }
 
-
-
+- (void)stopAnimating
+{
+    CAGradientLayer *gradientLayer = (CAGradientLayer *)self.layer;
+    if([gradientLayer animationForKey:kAnimationKey]) {
+        [gradientLayer removeAnimationForKey:kAnimationKey];
+    }
+}
 
 @end

@@ -14,6 +14,5 @@
 @property (strong, nonatomic) IBOutlet MTAnimatedLabel *animatedLabel;
 @property (strong, nonatomic) IBOutlet UIImageView *slider;
 
-- (IBAction)animate:(id)sender;
 
 @end

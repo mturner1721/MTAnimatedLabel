@@ -32,7 +32,7 @@
 - (void)pan:(UIPanGestureRecognizer *)gr
 {
     if (gr.state == UIGestureRecognizerStateBegan) {
-        [self animate:nil];
+        [self.animatedLabel stopAnimating];
     }
     
     if (gr.state == UIGestureRecognizerStateChanged) {
@@ -58,7 +58,7 @@
             f.origin.x = sliderInitialX;
             self.slider.frame = f;
         } completion:^(BOOL finished) {
-            [self animate:nil];
+            [self.animatedLabel startAnimating];
             self.animatedLabel.alpha = 1.0f;
         }];
         
@@ -68,14 +68,14 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self animate:nil];
+    [self.animatedLabel startAnimating];
     sliderInitialX = self.slider.frame.origin.x;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [self animate:nil];
+    [self.animatedLabel stopAnimating];
 }
 
 - (void)viewDidUnload
@@ -91,10 +91,7 @@
     return NO;
 }
 
-- (IBAction)animate:(id)sender
-{
-    [animatedLabel animate];
-}
+
 
 
 @end
