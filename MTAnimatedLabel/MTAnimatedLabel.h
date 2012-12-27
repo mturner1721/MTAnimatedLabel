@@ -32,6 +32,9 @@
 @property (nonatomic)           CGFloat gradientWidth;
 @property (nonatomic, strong)   UIColor *tint;
 
++ (NSString *)CAAlignmentFromUITextAlignment:(UITextAlignment)textAlignment;
++ (UITextAlignment)UITextAlignmentFromCAAlignment:(NSString *)alignment;
+
 - (void)startAnimating;
 - (void)stopAnimating;
 

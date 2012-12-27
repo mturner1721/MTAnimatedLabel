@@ -35,9 +35,6 @@
     
 @property (nonatomic, strong) CATextLayer *textLayer;
 
-+ (NSString *)CAAlignmentFromUITextAlignment:(UITextAlignment)textAlignment;
-+ (UITextAlignment)UITextAlignmentFromCAAlignment:(NSString *)alignment;
-
 @end
 
 
