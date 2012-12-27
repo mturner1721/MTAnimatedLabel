@@ -31,10 +31,12 @@
 
 #define kAnimationKey       @"gradientAnimation"
 
-@interface MTAnimatedLabel () {
+@interface MTAnimatedLabel () 
     
-    CATextLayer     *_textLayer;
-}
+@property (nonatomic, strong) CATextLayer *textLayer;
+
++ (NSString *)CAAlignmentFromUITextAlignment:(UITextAlignment)textAlignment;
++ (UITextAlignment)UITextAlignmentFromCAAlignment:(NSString *)alignment;
 
 @end
 
@@ -59,12 +61,12 @@
     gradientLayer.endPoint          = CGPointMake(0., 0.);
     gradientLayer.colors            = [NSArray arrayWithObjects:(id)[self.textColor CGColor],(id)[self.tint CGColor], (id)[self.textColor CGColor], nil];
 
-    _textLayer                      = [CATextLayer layer];
-    _textLayer.backgroundColor      = [[UIColor clearColor] CGColor];
-    _textLayer.contentsScale        = [[UIScreen mainScreen] scale];
-    _textLayer.rasterizationScale   = [[UIScreen mainScreen] scale];
-    _textLayer.bounds               = self.bounds;
-    _textLayer.anchorPoint          = CGPointZero;
+    self.textLayer                      = [CATextLayer layer];
+    self.textLayer.backgroundColor      = [[UIColor clearColor] CGColor];
+    self.textLayer.contentsScale        = [[UIScreen mainScreen] scale];
+    self.textLayer.rasterizationScale   = [[UIScreen mainScreen] scale];
+    self.textLayer.bounds               = self.bounds;
+    self.textLayer.anchorPoint          = CGPointZero;
     
     /* set initial values for the textLayer because they may have been loaded from a nib */
     [self setFont:          super.font];
@@ -76,7 +78,7 @@
         finally set the textLayer as the mask of the gradientLayer, this requires offscreen rendering
         and therefore this label subclass should ONLY BE USED if animation is required
      */
-    gradientLayer.mask = _textLayer;
+    gradientLayer.mask = self.textLayer;
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -115,18 +117,18 @@
 
 -(NSString *)text
 {
-    return _textLayer.string;
+    return self.textLayer.string;
 }
 
 - (void)setText:(NSString *)text
 {
-    _textLayer.string = text;
+    self.textLayer.string = text;
     [self setNeedsDisplay];
 }
 
 -(UIFont *)font
 {
-    CTFontRef ctFont    = _textLayer.font;
+    CTFontRef ctFont    = self.textLayer.font;
     NSString *fontName  = (__bridge NSString *)CTFontCopyName(ctFont, kCTFontPostScriptNameKey);
     CGFloat fontSize    = CTFontGetSize(ctFont);
     return [UIFont fontWithName:fontName size:fontSize];
@@ -135,15 +137,15 @@
 -(void) setFont:(UIFont *)font
 {
     CTFontRef fontRef = CTFontCreateWithName((__bridge CFStringRef)(font.fontName), font.pointSize, &CGAffineTransformIdentity);
-    _textLayer.font = fontRef;
-    _textLayer.fontSize = font.pointSize;
+    self.textLayer.font = fontRef;
+    self.textLayer.fontSize = font.pointSize;
     CFRelease(fontRef);
     [self setNeedsDisplay];
 }
 
 -(void)setFrame:(CGRect)frame
 {
-    //_textLayer.frame = frame;
+    //self.textLayer.frame = frame;
     [super setFrame:frame];
     [self setNeedsDisplay];
 }
@@ -154,35 +156,35 @@
 
 -(UIColor *)shadowColor
 {
-    return [UIColor colorWithCGColor:_textLayer.shadowColor];
+    return [UIColor colorWithCGColor:self.textLayer.shadowColor];
 }
 
 -(void)setShadowColor:(UIColor *)shadowColor
 {
-    _textLayer.shadowColor = shadowColor.CGColor;
+    self.textLayer.shadowColor = shadowColor.CGColor;
     [self setNeedsDisplay];
 }
 
 -(CGSize)shadowOffset
 {
-    return _textLayer.shadowOffset;
+    return self.textLayer.shadowOffset;
 }
 
 -(void)setShadowOffset:(CGSize)shadowOffset
 {
-    _textLayer.shadowOffset = shadowOffset;
+    self.textLayer.shadowOffset = shadowOffset;
     [self setNeedsDisplay];
 }
 */
 
 - (UITextAlignment)textAlignment
 {
-    return [MTAnimatedLabel UITextAlignmentFromCAAlignment:_textLayer.alignmentMode];
+    return [MTAnimatedLabel UITextAlignmentFromCAAlignment:self.textLayer.alignmentMode];
 }
 
 - (void)setTextAlignment:(UITextAlignment)textAlignment
 {
-    _textLayer.alignmentMode = [MTAnimatedLabel CAAlignmentFromUITextAlignment:textAlignment];
+    self.textLayer.alignmentMode = [MTAnimatedLabel CAAlignmentFromUITextAlignment:textAlignment];
 }
 
 #pragma mark - UILabel Layer override
@@ -220,7 +222,7 @@
 
 - (void)layoutSublayersOfLayer:(CALayer *)layer
 {
-    _textLayer.frame = self.layer.bounds;
+    self.textLayer.frame = self.layer.bounds;
 }
 
 #pragma mark - MTAnimated Label Public Methods

@@ -9,8 +9,8 @@ Pod::Spec.new do |s|
   	:git => "https://github.com/mturner1721/MTAnimatedLabel.git", 
   	:tag => "0.1" 
   }
-  s.platform     = :ios, '4.0'
-  s.source_files = 'MTAnimatedLabel', 'MTAnimatedLabel/MTAnimatedLabel.{h,m}'
+  s.platform     = :ios, '5.1'
+  s.source_files = 'MTAnimatedLabel/MT*.{h,m}'
   s.frameworks = 'CoreText', 'QuartzCore', 'UIKit', 'Foundation', 'CoreGraphics'
   s.requires_arc = true
 end
