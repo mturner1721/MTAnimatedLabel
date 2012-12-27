@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.author       = { "Michael Turner" => "mturner1721@icloud.com" }
   s.source       = { 
   	:git => "https://github.com/mturner1721/MTAnimatedLabel.git", 
-  	:tag => "0.1" 
+  	:tag => "0.1.1" 
   }
   s.platform     = :ios, '5.1'
   s.source_files = 'MTAnimatedLabel/MT*.{h,m}'

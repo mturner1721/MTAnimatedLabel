@@ -35,6 +35,9 @@
     
 @property (nonatomic, strong) CATextLayer *textLayer;
 
++ (NSString *)CAAlignmentFromUITextAlignment:(UITextAlignment)textAlignment;
++ (UITextAlignment)UITextAlignmentFromCAAlignment:(NSString *)alignment;
+
 @end
 
 
@@ -42,6 +45,7 @@
 @synthesize animationDuration   = _animationDuration;
 @synthesize gradientWidth       = _gradientWidth;
 @synthesize tint                = _tint;
+@synthesize textLayer           = _textLayer;
 
 #pragma mark - Initialization
 
