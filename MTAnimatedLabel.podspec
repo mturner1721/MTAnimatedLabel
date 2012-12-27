@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "MTAnimatedLabel"
-  s.version      = "0.1"
+  s.version      = "0.1.1"
   s.summary      = "MTAnimatedLabel is a UILabel subclass that supports animated text similar to the iPhone/iPad lock screen."
   s.homepage     = "https://github.com/mturner1721/MTAnimatedLabel"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
