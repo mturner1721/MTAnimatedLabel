@@ -2,7 +2,7 @@
 //  MTAnimatedLabel.m
 //  
 //
-//  Created by michael on 8/3/12.
+//  Created by Michael Turner on 8/3/12.
 //  Copyright (c) 2012 Michael Turner. All rights reserved.
 //
 
@@ -23,29 +23,22 @@
  */
 
 #import "MTAnimatedLabel.h"
-#import <objc/runtime.h>
 
-#define kGradientSize       0.45f
-#define kAnimationDuration  2.25f
-#define kGradientTint       [UIColor whiteColor]
+#define kGradientSize           0.45f
+#define kAnimationDuration      2.25f
+#define kGradientTint           [UIColor whiteColor]
 
-#define kAnimationKey       @"gradientAnimation"
+#define kAnimationKey           @"gradientAnimation"
+#define kGradientStartPointKey  @"startPoint"
+#define kGradientEndPointKey    @"endPoint"
 
 @interface MTAnimatedLabel () 
     
 @property (nonatomic, strong) CATextLayer *textLayer;
 
-+ (NSString *)CAAlignmentFromUITextAlignment:(UITextAlignment)textAlignment;
-+ (UITextAlignment)UITextAlignmentFromCAAlignment:(NSString *)alignment;
-
 @end
 
-
 @implementation MTAnimatedLabel
-@synthesize animationDuration   = _animationDuration;
-@synthesize gradientWidth       = _gradientWidth;
-@synthesize tint                = _tint;
-@synthesize textLayer           = _textLayer;
 
 #pragma mark - Initialization
 
@@ -60,7 +53,7 @@
     gradientLayer.backgroundColor   = [super.textColor CGColor];
     gradientLayer.startPoint        = CGPointMake(-self.gradientWidth, 0.);
     gradientLayer.endPoint          = CGPointMake(0., 0.);
-    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[self.textColor CGColor],(id)[self.tint CGColor], (id)[self.textColor CGColor], nil];
+    gradientLayer.colors            = @[(id)[self.textColor CGColor],(id)[self.tint CGColor], (id)[self.textColor CGColor]];
 
     self.textLayer                      = [CATextLayer layer];
     self.textLayer.backgroundColor      = [[UIColor clearColor] CGColor];
@@ -102,21 +95,25 @@
 
 #pragma mark - UILabel Accessor overrides
 
--(UIColor *)textColor
+- (UIColor *)textColor
 {
-    return [UIColor colorWithCGColor:self.layer.backgroundColor];
+    UIColor *textColor = [UIColor colorWithCGColor:self.layer.backgroundColor];
+    if (!textColor) {
+        textColor = [super textColor];
+    }
+    return textColor;
 }
 
--(void) setTextColor:(UIColor *)textColor
+- (void)setTextColor:(UIColor *)textColor
 {
     CAGradientLayer *gradientLayer  = (CAGradientLayer *)self.layer;
     gradientLayer.backgroundColor   = [textColor CGColor];
-    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[textColor CGColor],(id)[self.tint CGColor], (id)[textColor CGColor], nil];
+    gradientLayer.colors            = @[(id)[textColor CGColor],(id)[self.tint CGColor], (id)[textColor CGColor]];
     
     [self setNeedsDisplay];
 }
 
--(NSString *)text
+- (NSString *)text
 {
     return self.textLayer.string;
 }
@@ -127,7 +124,7 @@
     [self setNeedsDisplay];
 }
 
--(UIFont *)font
+- (UIFont *)font
 {
     CTFontRef ctFont    = self.textLayer.font;
     NSString *fontName  = (__bridge NSString *)CTFontCopyName(ctFont, kCTFontPostScriptNameKey);
@@ -135,7 +132,7 @@
     return [UIFont fontWithName:fontName size:fontSize];
 }
 
--(void) setFont:(UIFont *)font
+- (void)setFont:(UIFont *)font
 {
     CTFontRef fontRef = CTFontCreateWithName((__bridge CFStringRef)(font.fontName), font.pointSize, &CGAffineTransformIdentity);
     self.textLayer.font = fontRef;
@@ -144,39 +141,11 @@
     [self setNeedsDisplay];
 }
 
--(void)setFrame:(CGRect)frame
+- (void)setFrame:(CGRect)frame
 {
-    //self.textLayer.frame = frame;
     [super setFrame:frame];
     [self setNeedsDisplay];
 }
-
-
-/*
- //Shadows don't work with a masked layer
-
--(UIColor *)shadowColor
-{
-    return [UIColor colorWithCGColor:self.textLayer.shadowColor];
-}
-
--(void)setShadowColor:(UIColor *)shadowColor
-{
-    self.textLayer.shadowColor = shadowColor.CGColor;
-    [self setNeedsDisplay];
-}
-
--(CGSize)shadowOffset
-{
-    return self.textLayer.shadowOffset;
-}
-
--(void)setShadowOffset:(CGSize)shadowOffset
-{
-    self.textLayer.shadowOffset = shadowOffset;
-    [self setNeedsDisplay];
-}
-*/
 
 - (UITextAlignment)textAlignment
 {
@@ -223,6 +192,7 @@
 
 - (void)layoutSublayersOfLayer:(CALayer *)layer
 {
+    [super layoutSublayersOfLayer:layer];
     self.textLayer.frame = self.layer.bounds;
 }
 
@@ -233,25 +203,25 @@
     _tint = tint;
     
     CAGradientLayer *gradientLayer  = (CAGradientLayer *)self.layer;
-    gradientLayer.colors            = [NSArray arrayWithObjects:(id)[self.textColor CGColor],(id)[_tint CGColor], (id)[self.textColor CGColor], nil];
+    gradientLayer.colors            = @[(id)[self.textColor CGColor],(id)[_tint CGColor], (id)[self.textColor CGColor]];
     [self setNeedsDisplay];
 }
 
 - (void)startAnimating
 {
     CAGradientLayer *gradientLayer = (CAGradientLayer *)self.layer;
-    if([gradientLayer animationForKey:kAnimationKey] == nil) {
-        
-        CABasicAnimation *startPointAnimation = [CABasicAnimation animationWithKeyPath:@"startPoint"];
+    if([gradientLayer animationForKey:kAnimationKey] == nil)
+    {
+        CABasicAnimation *startPointAnimation = [CABasicAnimation animationWithKeyPath:kGradientStartPointKey];
         startPointAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(1.0, 0)];
         startPointAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
-        CABasicAnimation *endPointAnimation = [CABasicAnimation animationWithKeyPath:@"endPoint"];
+        CABasicAnimation *endPointAnimation = [CABasicAnimation animationWithKeyPath:kGradientEndPointKey];
         endPointAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(1+self.gradientWidth, 0)];
         endPointAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         
         CAAnimationGroup *group = [CAAnimationGroup animation];
-        group.animations = [NSArray arrayWithObjects:startPointAnimation, endPointAnimation, nil];
+        group.animations = @[startPointAnimation, endPointAnimation];
         group.duration = self.animationDuration;
         group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         group.repeatCount = FLT_MAX;
@@ -263,9 +233,8 @@
 - (void)stopAnimating
 {
     CAGradientLayer *gradientLayer = (CAGradientLayer *)self.layer;
-    if([gradientLayer animationForKey:kAnimationKey]) {
+    if([gradientLayer animationForKey:kAnimationKey])
         [gradientLayer removeAnimationForKey:kAnimationKey];
-    }
 }
 
 @end
