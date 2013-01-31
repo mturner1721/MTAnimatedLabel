@@ -127,7 +127,7 @@
 - (UIFont *)font
 {
     CTFontRef ctFont    = self.textLayer.font;
-    NSString *fontName  = (__bridge NSString *)CTFontCopyName(ctFont, kCTFontPostScriptNameKey);
+    NSString *fontName  = (__bridge_transfer NSString *)CTFontCopyName(ctFont, kCTFontPostScriptNameKey);
     CGFloat fontSize    = CTFontGetSize(ctFont);
     return [UIFont fontWithName:fontName size:fontSize];
 }
